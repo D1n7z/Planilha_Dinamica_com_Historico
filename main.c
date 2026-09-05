@@ -97,7 +97,7 @@ int somar_intervalo(planilha_t* p, int linha_ini, int linha_fim, int coluna_ini,
 
 int contar_nao_nulas(planilha_t* p) {
     // TODO: retorne a quantidade de celulas nao nulas
-    return 0;
+    return p->total_celulas;
 }
 
 bool definir_celula(planilha_t* p, int lin, int col, int valor) {
