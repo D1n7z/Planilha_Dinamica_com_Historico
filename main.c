@@ -1,4 +1,4 @@
-3/* ============================================================================
+/* ============================================================================
     EP1 - Planilha Esparsa com Histórico de Alterações
     TEMPLATE - preencha os TODOs abaixo. Não altere assinaturas de função,
     nomes ou ordem de campos de struct.
@@ -71,6 +71,10 @@ int igual(char* a, char* b) {
 
 void inicializar_planilha(planilha_t *p) {
     // TODO: inicialize primeiraLinha, primeiraColuna, total_celulas e historico.topo
+    p->primeira_linha = NULL;
+    p->primeira_coluna = NULL;
+    p->total_celulas = 0;
+    p->historico.topo = NULL;
 }
 
 celula_t* buscar_celula(planilha_t *p, int lin, int col,
