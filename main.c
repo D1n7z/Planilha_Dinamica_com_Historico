@@ -82,17 +82,111 @@ celula_t* buscar_celula(planilha_t *p, int lin, int col,
                       fileira_t** fil_ant_linha, fileira_t** fil_ant_coluna) {
     /* TODO: localize a celula (lin,col), preencha os quatro antecessores 
         por referencia, retorne NULL se a celula nao existir */
+    if(lin < 0 || col < 0){
+        return NULL;
+    }
+
+    *fil_ant_linha = NULL;
+    *fil_ant_coluna = NULL;
+    *cel_ant_linha = NULL;
+    *cel_ant_coluna = NULL;
+
+    fileira_t* linha_atual = p->primeira_linha;
+    fileira_t* coluna_atual = p->primeira_coluna;
+
+
+    while(linha_atual != NULL && linha_atual->indice < lin){
+        *fil_ant_linha = linha_atual;
+        linha_atual = linha_atual->proximo;
+    }
+
+    while(coluna_atual != NULL && coluna_atual->indice < col){
+        *fil_ant_coluna = coluna_atual;
+        coluna_atual = coluna_atual->proximo;
+    }
+
+    celula_t* celula_linha_atual = NULL;
+    if (linha_atual != NULL && linha_atual->indice == lin) {
+        celula_linha_atual = linha_atual->primeiro;
+
+         while(celula_linha_atual != NULL && celula_linha_atual->coluna < col){
+            *cel_ant_linha = celula_linha_atual;
+            celula_linha_atual = celula_linha_atual->proxima_linha;
+        }
+    } 
+
+    celula_t* celula_coluna_atual = NULL;
+    if (coluna_atual != NULL && coluna_atual->indice == col) {
+        celula_coluna_atual = coluna_atual->primeiro;
+        while(celula_coluna_atual != NULL && celula_coluna_atual->linha < lin){
+            *cel_ant_coluna= celula_coluna_atual;
+            celula_coluna_atual = celula_coluna_atual->proxima_coluna;
+        }
+    } 
+
+    if(celula_linha_atual != NULL && celula_linha_atual->coluna == col){         
+        return celula_linha_atual;     
+    }  
+    
+
     return NULL;
 }
 
 int obter_valor(planilha_t *p, int linha, int coluna) {
     // TODO: use buscarCelula; retorne 0 se a celula nao existir
+
+    celula_t* cel_ant_linha = NULL;
+    celula_t* cel_ant_coluna = NULL;
+    fileira_t* fil_ant_linha = NULL;
+    fileira_t* fil_ant_coluna = NULL;
+
+    celula_t* celula = buscar_celula(p, linha, coluna, &cel_ant_linha, &cel_ant_coluna, &fil_ant_linha, &fil_ant_coluna);
+    if (celula != NULL) {
+        return celula->valor;
+    }
+
     return 0;
 }
 
 int somar_intervalo(planilha_t* p, int linha_ini, int linha_fim, int coluna_ini, int coluna_fim) {
     // TODO: some os valores das celulas nao nulas no intervalo dado
-    return 0;
+
+    if(linha_ini > linha_fim || coluna_ini > coluna_fim || linha_ini < 0 || coluna_ini < 0 || linha_fim < 0 || coluna_fim < 0){
+        return 0;
+    }
+
+    int soma = 0;
+
+    fileira_t* linha_atual = p->primeira_linha;
+    while(linha_atual != NULL && linha_atual->indice < linha_ini){
+        linha_atual = linha_atual->proximo;
+    }
+
+    celula_t* celula_atual = NULL;
+    if(linha_atual != NULL){
+        celula_atual = linha_atual->primeiro;
+    }
+    
+
+    while((linha_atual != NULL && linha_atual->indice <= linha_fim)){
+        while(celula_atual != NULL && celula_atual->coluna < coluna_ini){
+            celula_atual = celula_atual->proxima_linha;
+        }
+        while(celula_atual != NULL && celula_atual->coluna <= coluna_fim){
+            soma += celula_atual->valor;
+            celula_atual = celula_atual->proxima_linha;
+        }
+
+        if(linha_atual->proximo != NULL && linha_atual->proximo->indice <= linha_fim){
+            linha_atual = linha_atual->proximo;
+            celula_atual = linha_atual->primeiro;
+        } else {
+            break;
+        }
+        
+    }
+
+    return soma;
 }
 
 int contar_nao_nulas(planilha_t* p) {
