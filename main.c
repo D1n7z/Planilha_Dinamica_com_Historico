@@ -134,6 +134,17 @@ celula_t* buscar_celula(planilha_t *p, int lin, int col,
 
 int obter_valor(planilha_t *p, int linha, int coluna) {
     // TODO: use buscarCelula; retorne 0 se a celula nao existir
+
+    celula_t* cel_ant_linha = NULL;
+    celula_t* cel_ant_coluna = NULL;
+    fileira_t* fil_ant_linha = NULL;
+    fileira_t* fil_ant_coluna = NULL;
+
+    celula_t* celula = buscar_celula(p, linha, coluna, &cel_ant_linha, &cel_ant_coluna, &fil_ant_linha, &fil_ant_coluna);
+    if (celula != NULL) {
+        return celula->valor;
+    }
+
     return 0;
 }
 
