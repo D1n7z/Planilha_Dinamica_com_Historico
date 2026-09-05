@@ -82,6 +82,53 @@ celula_t* buscar_celula(planilha_t *p, int lin, int col,
                       fileira_t** fil_ant_linha, fileira_t** fil_ant_coluna) {
     /* TODO: localize a celula (lin,col), preencha os quatro antecessores 
         por referencia, retorne NULL se a celula nao existir */
+    if(lin < 0 || col < 0){
+        return NULL;
+    }
+
+    *fil_ant_linha = NULL;
+    *fil_ant_coluna = NULL;
+    *cel_ant_linha = NULL;
+    *cel_ant_coluna = NULL;
+
+    fileira_t* linha_atual = p->primeira_linha;
+    fileira_t* coluna_atual = p->primeira_coluna;
+
+
+    while(linha_atual != NULL && linha_atual->indice < lin){
+        *fil_ant_linha = linha_atual;
+        linha_atual = linha_atual->proximo;
+    }
+
+    while(coluna_atual != NULL && coluna_atual->indice < col){
+        *fil_ant_coluna = coluna_atual;
+        coluna_atual = coluna_atual->proximo;
+    }
+
+    celula_t* celula_linha_atual = NULL;
+    if (linha_atual != NULL && linha_atual->indice == lin) {
+        celula_linha_atual = linha_atual->primeiro;
+
+         while(celula_linha_atual != NULL && celula_linha_atual->coluna < col){
+            *cel_ant_linha = celula_linha_atual;
+            celula_linha_atual = celula_linha_atual->proxima_linha;
+        }
+    } 
+
+    celula_t* celula_coluna_atual = NULL;
+    if (coluna_atual != NULL && coluna_atual->indice == col) {
+        celula_coluna_atual = coluna_atual->primeiro;
+        while(celula_coluna_atual != NULL && celula_coluna_atual->linha < lin){
+            *cel_ant_coluna= celula_coluna_atual;
+            celula_coluna_atual = celula_coluna_atual->proxima_coluna;
+        }
+    } 
+
+    if(celula_linha_atual != NULL && celula_linha_atual->coluna == col){         
+        return celula_linha_atual;     
+    }  
+    
+
     return NULL;
 }
 
