@@ -198,12 +198,89 @@ bool definir_celula(planilha_t* p, int lin, int col, int valor) {
     /* TODO: implemente os 4 casos (atualizar/criar/remover/nulo),
        empilhando em p->historico quando houver alteracao efetiva.
        Retorna true se houve alteracao, false se foi operacao nula. */
+        
+    
+    celula_t** cel_ant_linha;
+    celula_t** cel_ant_coluna;
+    fileira_t** fil_ant_linha; 
+    fileira_t** fil_ant_coluna;
+
+    
+    celula_t* celula_atual = buscar_celula(p, lin, col, cel_ant_linha, cel_ant_coluna, fil_ant_linha, fil_ant_coluna);
+
+    if(celula_atual){
+        if(valor != 0){ //atualizar valor
+
+            if(celula_atual->valor != valor){ 
+                elo_pilha_t *elo_pilha = malloc(sizeof(elo_pilha_t));
+                elo_pilha->op.linha = cel_ant_linha;
+                elo_pilha->op.coluna = cel_ant_coluna;
+                elo_pilha->op.transposicao = false;
+                elo_pilha->op.valor_anterior = celula_atual->valor;
+
+                elo_pilha->proximo = p->historico.topo;
+                p->historico.topo = elo_pilha;
+                celula_atual->valor = valor;
+
+                return true;
+            }
+        } else { //remover
+            (*cel_ant_coluna)->proxima_coluna = celula_atual->proxima_coluna;
+            (*cel_ant_linha)->proxima_linha = celula_atual->proxima_linha;
+            (*fil_ant_coluna)->proximo = celula_atual->proxima_coluna;
+            (*fil_ant_linha)->proximo = celula_atual->proxima_linha;
+
+            elo_pilha_t *elo_pilha = malloc(sizeof(elo_pilha_t));
+            elo_pilha->op.linha = cel_ant_linha;
+            elo_pilha->op.coluna = cel_ant_coluna;
+            elo_pilha->op.transposicao = false;
+            elo_pilha->op.valor_anterior = celula_atual->valor;
+            
+            elo_pilha->proximo = p->historico.topo;
+            p->historico.topo = elo_pilha;
+            free(celula_atual);
+
+            return true;
+        }
+    } else {
+        if (valor == 0){ //criar celula
+            elo_pilha_t *elo_pilha = malloc(sizeof(elo_pilha_t));
+            elo_pilha->op.linha = lin;
+            elo_pilha->op.coluna = col;
+            elo_pilha->op.transposicao = false;
+            elo_pilha->op.valor_anterior = 0;
+
+            elo_pilha->proximo = p->historico.topo;
+            p->historico.topo = elo_pilha;
+
+            celula_t *cel_atual = malloc(sizeof(celula_t));
+            fileira_t *fil_atual_coluna = malloc(sizeof(fileira_t));
+            fileira_t *fil_atual_linha = malloc(sizeof(fileira_t));
+
+            cel_atual->proxima_coluna = (*cel_ant_coluna)->proxima_coluna;
+            cel_atual->proxima_linha = (*cel_ant_linha)->proxima_linha;
+            fil_atual_coluna->proximo = (*fil_ant_coluna)->proximo;
+            fil_atual_linha->proximo = (*fil_ant_linha)->proximo;
+
+
+            (*cel_ant_coluna)->proxima_coluna = cel_atual;
+            (*cel_ant_linha)->proxima_linha = cel_atual;
+            (*fil_ant_coluna)->proximo = fil_atual_coluna;
+            (*fil_ant_linha)->proximo = fil_atual_linha;
+
+            cel_atual->valor = valor;
+
+            return true;
+        } 
+    }     
+
+
     return false;
 }
 
 bool remover_celula(planilha_t* p, int lin, int col) {
     // TODO: remova a celula (lin,col)
-    return false;
+    return definir_celula(p, lin, col, 0);
 }
 
 bool transpor(planilha_t* p, int lin, int col, int tamanho) {
