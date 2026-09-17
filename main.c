@@ -286,7 +286,31 @@ bool remover_celula(planilha_t* p, int lin, int col) {
 bool transpor(planilha_t* p, int lin, int col, int tamanho) {
     /* TODO: transpoe uma matriz quadrada que está localizada entre
        as linhas [lin, lin + tamanho) e colunas [col, col + tamanho). */
-    return false;
+
+    elo_pilha_t *elo_pilha = malloc(sizeof(elo_pilha_t));
+    elo_pilha->op.linha = lin;
+    elo_pilha->op.coluna = col;
+    elo_pilha->op.transposicao = true;
+    elo_pilha->op.tamanho = tamanho;
+
+    elo_pilha->proximo = p->historico.topo;
+    p->historico.topo = elo_pilha;
+
+    int *matriz = (int *) malloc(sizeof(int)*tamanho*tamanho);
+
+    for(int i=0; i<tamanho; i++){
+        for(int j=0; j<tamanho; j++){
+            matriz[tamanho * j + i] = obter_valor(p, lin+i, col+j);
+        }
+    }
+
+    for(int i=0; i<tamanho; i++){
+        for(int j=0; j<tamanho; j++){
+            definir_celula(p, lin+i, col+j, matriz[tamanho * i + j]);
+        }
+    }
+
+    return true;
 }
 
 bool desfazer(planilha_t* p) {
