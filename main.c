@@ -335,6 +335,22 @@ void exibir_planilha(planilha_t *p) {
     /* TODO: imprima "linha coluna valor" por linha, em ordem crescente
        de linha e, dentro de cada linha, de coluna. Se vazia, imprima
        "PLANILHA VAZIA" */
+    fileira_t* linha_atual = p->primeira_linha;
+    celula_t* celula_atual;
+
+    if(linha_atual == NULL){
+        printf("PLANILHA VAZIA");
+        return;
+    }
+
+    while(linha_atual){
+        celula_atual = linha_atual->primeiro;
+        while(celula_atual){
+            printf("linha %d coluna %d valor %d\n", celula_atual->linha, celula_atual->coluna, celula_atual->valor);
+            celula_atual = celula_atual->proxima_linha;
+        }
+        linha_atual = linha_atual->proximo;
+    }
 }
 
 void exibir_historico(planilha_t* p) {
