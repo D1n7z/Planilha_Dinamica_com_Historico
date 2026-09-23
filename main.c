@@ -317,7 +317,7 @@ bool desfazer(planilha_t* p) {
     /* TODO: desempilhe de p->historico e restaure o valor anterior.
        Retorna false se o historico estiver vazio, true caso contrario. */
     if(p->historico.topo != NULL){
-        operacao_t* op_topo = p->historico.topo->op;
+        operacao_t* op_topo = &p->historico.topo->op;
         if(op_topo->transposicao){
             transpor(p, op_topo->linha, op_topo->coluna, op_topo->tamanho);
             p->historico.topo = p->historico.topo->proximo->proximo;
