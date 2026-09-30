@@ -508,6 +508,32 @@ void exibir_historico(planilha_t* p) {
 
 void liberar_tudo(planilha_t* p) {
     // TODO: libere toda a memória alocada por fileira, celula, e pilha.
+    fileira_t* linha_atual = p->primeira_linha;
+    while(linha_atual){
+        celula_t* celula_atual = linha_atual->primeiro;
+        while(celula_atual){
+            celula_t* temp_celula = celula_atual;
+            celula_atual = celula_atual->proxima_linha;
+            free(temp_celula);
+        }
+        fileira_t* temp_linha = linha_atual;
+        linha_atual = linha_atual->proximo;
+        free(temp_linha);
+    }   
+
+    fileira_t* coluna_atual = p->primeira_coluna;
+    while(coluna_atual){
+        fileira_t* temp_coluna = coluna_atual;
+        coluna_atual = coluna_atual->proximo;
+        free(temp_coluna);  
+    }
+    
+    elo_pilha_t* elo_atual = p->historico.topo;
+    while(elo_atual){
+        elo_pilha_t* temp_elo = elo_atual;
+        elo_atual = elo_atual->proximo;
+        free(temp_elo);
+    }
 }
 
 /* ---------------------------------------------------------------------- *
