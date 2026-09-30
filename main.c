@@ -495,6 +495,15 @@ void exibir_planilha(planilha_t *p) {
 void exibir_historico(planilha_t* p) {
     /* TODO: imprima "linha coluna valor_anterior" por linha, do topo
        para a base. Se vazio, imprima "HISTORICO VAZIO" */
+    elo_pilha_t* elo_atual = p->historico.topo;
+    while(elo_atual){
+        if(elo_atual->op.transposicao){
+            printf("%d %d TRANS %d\n", elo_atual->op.linha, elo_atual->op.coluna, elo_atual->op.tamanho);
+        } else{
+            printf("%d %d %d\n", elo_atual->op.linha, elo_atual->op.coluna, elo_atual->op.valor_anterior);
+        }
+        elo_atual = elo_atual->proximo;
+    }   
 }
 
 void liberar_tudo(planilha_t* p) {
