@@ -364,6 +364,10 @@ bool definir_celula(planilha_t* p, int lin, int col, int valor) {
 
     celula_t* celula_atual = buscar_celula(p, lin, col, &cel_ant_linha, &cel_ant_coluna, &linha_anterior, &coluna_anterior);
 
+    if (celula_atual && celula_atual->valor == valor) { //operacao nula 
+        return false;
+    }
+    
     if(celula_atual){
         //atualizar valor ou remover celula
             elo_pilha_t *elo_pilha = malloc(sizeof(elo_pilha_t));
