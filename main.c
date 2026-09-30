@@ -339,6 +339,7 @@ bool auxiliar_definir_celula(planilha_t* p, int lin, int col, int valor) {
                 coluna_atual->primeiro = nova_celula;
             }
 
+            p->total_celulas++;
             return true;
 
         } else { //operacao nula
