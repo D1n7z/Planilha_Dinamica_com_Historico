@@ -503,7 +503,7 @@ void exibir_historico(planilha_t* p) {
     elo_pilha_t* elo_atual = p->historico.topo;
     while(elo_atual){
         if(elo_atual->op.transposicao){
-            printf("%d %d TRANS %d\n", elo_atual->op.linha, elo_atual->op.coluna, elo_atual->op.tamanho);
+            printf("T %d %d %d\n", elo_atual->op.linha, elo_atual->op.coluna, elo_atual->op.tamanho);
         } else{
             printf("%d %d %d\n", elo_atual->op.linha, elo_atual->op.coluna, elo_atual->op.valor_anterior);
         }
