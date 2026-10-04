@@ -151,39 +151,29 @@ int obter_valor(planilha_t *p, int linha, int coluna) {
 int somar_intervalo(planilha_t* p, int linha_ini, int linha_fim, int coluna_ini, int coluna_fim) {
     // TODO: some os valores das celulas nao nulas no intervalo dado
 
-    if(linha_ini > linha_fim || coluna_ini > coluna_fim || linha_ini < 0 || coluna_ini < 0 || linha_fim < 0 || coluna_fim < 0){
+    if(linha_ini > linha_fim || coluna_ini > coluna_fim || linha_ini < 0 || coluna_ini < 0 || linha_fim < 0 || coluna_fim < 0 || p->total_celulas == 0){
         return 0;
     }
 
     int soma = 0;
 
+    // Encontrar a primeira linha que está dentro do intervalo
     fileira_t* linha_atual = p->primeira_linha;
     while(linha_atual != NULL && linha_atual->indice < linha_ini){
         linha_atual = linha_atual->proximo;
     }
-
-    celula_t* celula_atual = NULL;
-    if(linha_atual != NULL){
-        celula_atual = linha_atual->primeiro;
-    }
     
+    while(linha_atual != NULL && linha_atual->indice <= linha_fim){
+        celula_t* celula_atual = linha_atual->primeiro;
 
-    while((linha_atual != NULL && linha_atual->indice <= linha_fim)){
-        while(celula_atual != NULL && celula_atual->coluna < coluna_ini){
+        while(celula_atual != NULL && celula_atual->coluna < coluna_ini) {
             celula_atual = celula_atual->proxima_linha;
         }
-        while(celula_atual != NULL && celula_atual->coluna <= coluna_fim){
+        while(celula_atual != NULL && celula_atual->coluna <= coluna_fim) {
             soma += celula_atual->valor;
             celula_atual = celula_atual->proxima_linha;
         }
-
-        if(linha_atual->proximo != NULL && linha_atual->proximo->indice <= linha_fim){
-            linha_atual = linha_atual->proximo;
-            celula_atual = linha_atual->primeiro;
-        } else {
-            break;
-        }
-        
+        linha_atual = linha_atual->proximo;
     }
 
     return soma;
