@@ -560,6 +560,8 @@ void liberar_tudo(planilha_t* p) {
         elo_atual = elo_atual->proximo;
         free(temp_elo);
     }
+
+    inicializar_planilha(p);
 }
 
 /* ---------------------------------------------------------------------- *
