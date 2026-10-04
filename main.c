@@ -414,45 +414,119 @@ bool remover_celula(planilha_t* p, int lin, int col) {
 }
 
 bool auxiliar_transpor(planilha_t* p, int lin, int col, int tamanho) {
-    if (tamanho <= 1) {
+    if (tamanho <= 1) return false;
+
+    int int_max = 2147483647;
+
+    if (lin < 0 || col < 0 || lin > int_max - tamanho + 1 || col > int_max - tamanho + 1) {
         return false;
     }
 
-    int *matriz = (int *) malloc(sizeof(int)*tamanho*tamanho);
-
     bool transposta = false;
-
-    for(int i=0; i<tamanho; i++){
-        for(int j=0; j<tamanho; j++){
-            matriz[tamanho * j + i] = obter_valor(p, lin+i, col+j);
-        }
+    int lin_max = lin + tamanho - 1;
+    int col_max = col + tamanho - 1;
+    
+    // Encontrar a primeira linha que está dentro do intervalo
+    fileira_t* linha_atual = p->primeira_linha;
+    while(linha_atual != NULL && linha_atual->indice < lin){
+        linha_atual = linha_atual->proximo;
     }
 
-    for(int i=0; i<tamanho; i++){
-        for(int j=0; j<tamanho; j++){
-            celula_t* cel_ant_linha = NULL;
-            celula_t* cel_ant_coluna = NULL;
-            fileira_t* linha_anterior = NULL; 
-            fileira_t* coluna_anterior = NULL;
+    if (linha_atual == NULL || linha_atual->indice > lin_max) {
+        return false;
+    }
 
-            celula_t* celula_atual = buscar_celula(p, lin+i, col+j, &cel_ant_linha, &cel_ant_coluna, &linha_anterior, &coluna_anterior);
-            if (celula_atual && celula_atual->valor != matriz[tamanho * i + j]) {
-                transposta = true;
-            } else if (!celula_atual && matriz[tamanho * i + j] != 0) {
+    int tamanho_real = 0;
+    fileira_t* temp_linha = linha_atual;
+    
+    // Contar as células
+    while(temp_linha != NULL && temp_linha->indice <= lin_max){
+        celula_t* c = temp_linha->primeiro;
+        while(c != NULL && c->coluna < col) {
+            c = c->proxima_linha;
+        }
+        while(c != NULL && c->coluna <= col_max) {
+            tamanho_real++;
+            c = c->proxima_linha;
+        }
+        temp_linha = temp_linha->proximo;
+    }
+
+    if (tamanho_real == 0) return false;
+
+    //salvar linhas, colunas e valores das células
+    typedef struct { int l; int c; int v; } dado_t;
+    dado_t* dados = malloc(tamanho_real * sizeof(dado_t));
+    
+    int pos = 0;
+    temp_linha = linha_atual; 
+    
+    // Salvar os dados 
+    while(temp_linha != NULL && temp_linha->indice <= lin_max){
+        celula_t* c = temp_linha->primeiro;
+        while(c != NULL && c->coluna < col) {
+            c = c->proxima_linha;
+        }
+        while(c != NULL && c->coluna <= col_max) {
+            dados[pos].l = c->linha;
+            dados[pos].c = c->coluna;
+            dados[pos].v = c->valor;
+            
+            int novo_l = lin + (c->coluna - col);
+            int novo_c = col + (c->linha - lin);
+            if (!transposta && obter_valor(p, novo_l, novo_c) != c->valor) {
                 transposta = true;
             }
-            auxiliar_definir_celula(p, lin+i, col+j, matriz[tamanho * i + j], cel_ant_linha, cel_ant_coluna, linha_anterior, coluna_anterior, celula_atual);
+
+            pos++;
+            c = c->proxima_linha; 
+        }
+        temp_linha = temp_linha->proximo;
+    }
+
+    if (!transposta) {
+        free(dados);
+        return false;
+    }
+
+    // Remover todas as células antigas
+    for (int i = 0; i < tamanho_real; i++) {
+        celula_t* cel_ant_linha = NULL, *cel_ant_coluna = NULL;
+        fileira_t* fil_ant_linha = NULL, *fil_ant_coluna = NULL;
+        
+        celula_t* celula_atual = buscar_celula(p, dados[i].l, dados[i].c, &cel_ant_linha, &cel_ant_coluna, &fil_ant_linha, &fil_ant_coluna);
+        
+        if (celula_atual) {
+            auxiliar_definir_celula(p, dados[i].l, dados[i].c, 0, cel_ant_linha, cel_ant_coluna, fil_ant_linha, fil_ant_coluna, celula_atual);
         }
     }
 
-    free(matriz);
-    
-    return transposta;
+    // Inserir as células nas novas coordenadas 
+    for (int i = 0; i < tamanho_real; i++) {
+        int novo_l = lin + (dados[i].c - col);
+        int novo_c = col + (dados[i].l - lin);
+
+        celula_t* cel_ant_linha = NULL;
+        celula_t* cel_ant_coluna = NULL;
+        fileira_t* fil_ant_linha = NULL;
+        fileira_t* fil_ant_coluna = NULL;  
+
+        celula_t* celula_atual = buscar_celula(p, novo_l, novo_c, &cel_ant_linha, &cel_ant_coluna, &fil_ant_linha, &fil_ant_coluna);
+        
+        auxiliar_definir_celula(p, novo_l, novo_c, dados[i].v, cel_ant_linha, cel_ant_coluna, fil_ant_linha, fil_ant_coluna, celula_atual);
+    }
+
+    free(dados);
+    return true; 
 }
 
 bool transpor(planilha_t* p, int lin, int col, int tamanho) {
     /* TODO: transpoe uma matriz quadrada que está localizada entre
        as linhas [lin, lin + tamanho) e colunas [col, col + tamanho). */
+
+    if (tamanho <= 1) {
+        return false;
+    }
 
     bool saida = auxiliar_transpor(p, lin, col, tamanho);
 
