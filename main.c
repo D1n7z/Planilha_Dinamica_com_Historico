@@ -408,7 +408,7 @@ bool auxiliar_transpor(planilha_t* p, int lin, int col, int tamanho) {
 
     int int_max = 2147483647;
 
-    if (lin < 0 || col < 0 || lin > int_max - tamanho + 1 || col > int_max - tamanho + 1) {
+    if (lin < 0 || col < 0 || lin > int_max - tamanho || col > int_max - tamanho || p->total_celulas == 0) {
         return false;
     }
 
