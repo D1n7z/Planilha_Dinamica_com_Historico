@@ -194,14 +194,7 @@ int contar_nao_nulas(planilha_t* p) {
     return p->total_celulas;
 }
 
-bool auxiliar_definir_celula(planilha_t* p, int lin, int col, int valor) {
-    celula_t* cel_ant_linha = NULL;
-    celula_t* cel_ant_coluna = NULL;
-    fileira_t* linha_anterior = NULL; 
-    fileira_t* coluna_anterior = NULL;
-
-    celula_t* celula_atual = buscar_celula(p, lin, col, &cel_ant_linha, &cel_ant_coluna, &linha_anterior, &coluna_anterior);
-
+bool auxiliar_definir_celula(planilha_t* p, int lin, int col, int valor, celula_t* cel_ant_linha, celula_t* cel_ant_coluna, fileira_t* linha_anterior, fileira_t* coluna_anterior, celula_t* celula_atual) {
 
     if(celula_atual){
         if(valor != 0){ //atualizar valor
@@ -378,7 +371,7 @@ bool definir_celula(planilha_t* p, int lin, int col, int valor) {
             elo_pilha->proximo = p->historico.topo;
             p->historico.topo = elo_pilha;
 
-            if(auxiliar_definir_celula(p, lin, col, valor)){
+            if(auxiliar_definir_celula(p, lin, col, valor, cel_ant_linha, cel_ant_coluna, linha_anterior, coluna_anterior, celula_atual)){
                 return true;
             } else{
                 elo_pilha_t *temp = p->historico.topo;
@@ -397,7 +390,7 @@ bool definir_celula(planilha_t* p, int lin, int col, int valor) {
             elo_pilha->proximo = p->historico.topo;
             p->historico.topo = elo_pilha;
 
-            if(auxiliar_definir_celula(p, lin, col, valor)){
+            if(auxiliar_definir_celula(p, lin, col, valor, cel_ant_linha, cel_ant_coluna, linha_anterior, coluna_anterior, celula_atual)){
                 return true;
             } else{
                 elo_pilha_t *temp = p->historico.topo;
@@ -431,7 +424,14 @@ bool auxiliar_transpor(planilha_t* p, int lin, int col, int tamanho) {
 
     for(int i=0; i<tamanho; i++){
         for(int j=0; j<tamanho; j++){
-            auxiliar_definir_celula(p, lin+i, col+j, matriz[tamanho * i + j]);
+            celula_t* cel_ant_linha = NULL;
+            celula_t* cel_ant_coluna = NULL;
+            fileira_t* linha_anterior = NULL; 
+            fileira_t* coluna_anterior = NULL;
+
+            celula_t* celula_atual = buscar_celula(p, lin+i, col+j, &cel_ant_linha, &cel_ant_coluna, &linha_anterior, &coluna_anterior);
+
+            auxiliar_definir_celula(p, lin+i, col+j, matriz[tamanho * i + j], cel_ant_linha, cel_ant_coluna, linha_anterior, coluna_anterior, celula_atual);
         }
     }
 
@@ -469,7 +469,14 @@ bool desfazer(planilha_t* p) {
             p->historico.topo = temp->proximo;
             free(temp);
         } else{
-            auxiliar_definir_celula(p, op_topo->linha, op_topo->coluna, op_topo->valor_anterior);
+            celula_t* cel_ant_linha = NULL;
+            celula_t* cel_ant_coluna = NULL;
+            fileira_t* linha_anterior = NULL; 
+            fileira_t* coluna_anterior = NULL;
+
+
+            celula_t* celula_atual = buscar_celula(p, op_topo->linha, op_topo->coluna, &cel_ant_linha, &cel_ant_coluna, &linha_anterior, &coluna_anterior);
+            auxiliar_definir_celula(p, op_topo->linha, op_topo->coluna, op_topo->valor_anterior, cel_ant_linha, cel_ant_coluna, linha_anterior, coluna_anterior, celula_atual);
             elo_pilha_t* temp = p->historico.topo;
             p->historico.topo = temp->proximo;
             free(temp);
