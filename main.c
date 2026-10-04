@@ -414,7 +414,13 @@ bool remover_celula(planilha_t* p, int lin, int col) {
 }
 
 bool auxiliar_transpor(planilha_t* p, int lin, int col, int tamanho) {
-     int *matriz = (int *) malloc(sizeof(int)*tamanho*tamanho);
+    if (tamanho <= 1) {
+        return false;
+    }
+
+    int *matriz = (int *) malloc(sizeof(int)*tamanho*tamanho);
+
+    bool transposta = false;
 
     for(int i=0; i<tamanho; i++){
         for(int j=0; j<tamanho; j++){
@@ -430,21 +436,29 @@ bool auxiliar_transpor(planilha_t* p, int lin, int col, int tamanho) {
             fileira_t* coluna_anterior = NULL;
 
             celula_t* celula_atual = buscar_celula(p, lin+i, col+j, &cel_ant_linha, &cel_ant_coluna, &linha_anterior, &coluna_anterior);
-
+            if (celula_atual && celula_atual->valor != matriz[tamanho * i + j]) {
+                transposta = true;
+            } else if (!celula_atual && matriz[tamanho * i + j] != 0) {
+                transposta = true;
+            }
             auxiliar_definir_celula(p, lin+i, col+j, matriz[tamanho * i + j], cel_ant_linha, cel_ant_coluna, linha_anterior, coluna_anterior, celula_atual);
         }
     }
 
     free(matriz);
     
-    return true;
+    return transposta;
 }
 
 bool transpor(planilha_t* p, int lin, int col, int tamanho) {
     /* TODO: transpoe uma matriz quadrada que está localizada entre
        as linhas [lin, lin + tamanho) e colunas [col, col + tamanho). */
 
-    auxiliar_transpor(p, lin, col, tamanho);
+    bool saida = auxiliar_transpor(p, lin, col, tamanho);
+
+    if (!saida) {
+        return false;
+    }
 
     elo_pilha_t *elo_pilha = malloc(sizeof(elo_pilha_t));
     elo_pilha->op.linha = lin;
