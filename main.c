@@ -562,6 +562,7 @@ bool desfazer(planilha_t* p) {
         return true;
     }
     
+    printf("HISTORICO VAZIO\n");
     return false;
 }
 
@@ -569,6 +570,12 @@ void exibir_planilha(planilha_t *p) {
     /* TODO: imprima "linha coluna valor" por linha, em ordem crescente
        de linha e, dentro de cada linha, de coluna. Se vazia, imprima
        "PLANILHA VAZIA" */
+    if (p->total_celulas == 0) {
+        printf("PLANILHA VAZIA\n");
+        return;
+    }
+
+    printf("PLANILHA\n");
     fileira_t* linha_atual = p->primeira_linha;
     celula_t* celula_atual;
 
@@ -585,6 +592,12 @@ void exibir_planilha(planilha_t *p) {
 void exibir_historico(planilha_t* p) {
     /* TODO: imprima "linha coluna valor_anterior" por linha, do topo
        para a base. Se vazio, imprima "HISTORICO VAZIO" */
+    if (p->historico.topo == NULL) {
+        printf("HISTORICO VAZIO\n");
+        return;
+    }
+
+    printf("HISTORICO\n");
     elo_pilha_t* elo_atual = p->historico.topo;
     while(elo_atual){
         if(elo_atual->op.transposicao){
@@ -675,24 +688,11 @@ int main(int argc, char *argv[]) {
         } else if (igual(cmd, "CONT")) {
             fprintf(saida, "CONT %d\n", contar_nao_nulas(&p));
         } else if (igual(cmd, "DESFAZER")) {
-            if (!desfazer(&p)) {
-                fprintf(saida, "HISTORICO VAZIO\n");
-            }
+            desfazer(&p); 
         } else if (igual(cmd, "EXIBIR")) {
-            if (contar_nao_nulas(&p)) {
-                printf("PLANILHA\n");
-                exibir_planilha(&p);
-            } else {
-                printf("PLANILHA VAZIA\n");
-            }
+            exibir_planilha(&p); 
         } else if (igual(cmd, "HIST")) {
-            if (p.historico.topo) {
-                printf("HISTORICO\n");
-                exibir_historico(&p);
-            }
-            else {
-                printf("HISTORICO VAZIO\n");
-            }
+            exibir_historico(&p); 
         } else if (igual(cmd, "TRANS")) {
             int lin, col, tam;
             fscanf(entrada, "%d %d %d", &lin, &col, &tam);
